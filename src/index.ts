@@ -1,7 +1,6 @@
 import './scss/styles.scss';
-import { IOrder } from './types';
+import { IOrder, PaymentType } from './types';
 
-class order implements IOrder {
-
-
+class Order implements IOrder {
+		
 }
