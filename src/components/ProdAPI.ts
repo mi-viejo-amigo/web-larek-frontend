@@ -1,11 +1,16 @@
-import { Api, ApiListResponse } from './base/api';
-import {TOrderResult, ICardDate, IOrder} from "../types/index";
+import { Api } from './base/api';
+import {TOrderResult, IProduct, IOrder, TServerProduct} from "../types/index";
 
 
+
+export type ApiListResponse<T> = {
+    total: number,
+    items: T[]
+};
 
 export interface IProdAPI {
-    getCardList: () => Promise<ICardDate[]>;
-    orderItems: (order: IOrder) => Promise<TOrderResult>;
+    getCardList: () => Promise<TServerProduct[]>;
+    orderItems: (userDates: IOrder, itemsId: string[], totalPrice: number) => Promise<TOrderResult>; 
 }
 
 export class ProdAPI extends Api implements IProdAPI {
@@ -16,8 +21,8 @@ export class ProdAPI extends Api implements IProdAPI {
         this.cdn = cdn;
     }
 
-    getCardList(): Promise<ICardDate[]> {
-        return this.get('/product').then((data: ApiListResponse<ICardDate>) =>
+    getCardList(): Promise<TServerProduct[]> {
+        return this.get<ApiListResponse<TServerProduct>>('/product').then((data: ApiListResponse<TServerProduct>) =>
             data.items.map((item) => ({
                 ...item,
                 image: this.cdn + item.image
@@ -25,8 +30,9 @@ export class ProdAPI extends Api implements IProdAPI {
         );
     }
 
-    orderItems(order: IOrder): Promise<TOrderResult> {
-        return this.post('/order', order).then(
+    orderItems(userDates: IOrder, itemsId: string[], totalPrice: number): Promise<TOrderResult> {
+        const order = {...userDates, items: itemsId, total: totalPrice}
+        return this.post<TOrderResult>('/order', order).then(
             (data: TOrderResult) => data
         );
     }
