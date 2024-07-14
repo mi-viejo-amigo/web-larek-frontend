@@ -1,10 +1,10 @@
-import { IEvents } from "../components/base/events";
+import { IEvents } from "../components/base/events"
 
-export type CardСategory = 'хард-скил' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'другое';
-export type TPayment = 'Онлайн' | 'При получении';
+export type CardСategory = 'хард-скил' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'другое'
+export type TPayment = 'Онлайн' | 'При получении' | ''
 export type TPaymentForm = Pick<IOrder, 'payment' | 'address'>
 export type TContactForm = Pick<IOrder, 'email' | 'phone'>
-export type TBasketData = Pick<IProduct , 'id' | 'title' | 'price'>;
+export type TBasketData = Pick<IProduct , 'id' | 'title' | 'price'>
 
 // Типы для данных получаемых с севера.
 export type TServerProduct = Partial<IProduct>
@@ -21,15 +21,15 @@ export interface IProduct {
   description?: string
   image: string
   price: number | null
-  inBasket?: boolean
+  inBasket: boolean
 }
 
 export interface IOrder {
   email: string;
   phone: string;
   address: string;
-  payment: string;
+  payment: TPayment;
 }
 
-export type FormErrors = Partial<Record<keyof IOrder, string>>;
+export type IFormErrors = Partial<Record<keyof IOrder, string>>;
 

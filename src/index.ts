@@ -6,10 +6,11 @@ import { ProdAPI } from './components/ProdAPI'
 import { ProductsData } from './components/ProductData'
 import { Card } from './components/Card'
 import { Order } from './components/Order'
-import { IOrder, IProduct } from './types'
+import { IFormErrors, IOrder, IProduct, TPayment } from './types'
 import { Page } from './components/Page'
 import { Modal } from './components/common/Modal'
 import { BasketView } from './components/common/Basket'
+import { PaymentForm } from './components/common/PaymentForm'
 
 // Шаблоны Карточек
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog')
@@ -18,6 +19,8 @@ const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket')
 
 // Шаблон Корзины
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket')
+const paymentFormTemplate = ensureElement<HTMLTemplateElement>('#order')
+const contactFormTemplate = ensureElement<HTMLTemplateElement>('#contacts')
 
 // Элемент модального Окна
 const modalContainer = ensureElement<HTMLElement>('#modal-container')
@@ -26,13 +29,28 @@ const modalContainer = ensureElement<HTMLElement>('#modal-container')
 const events = new EventEmitter()
 const api = new ProdAPI(CDN_URL, API_URL)
 const appData = new ProductsData({}, events)
+const orderData = new Order({}, events)
 const page = new Page(document.body, events)
 const modal = new Modal(modalContainer, events)
 const basket = new BasketView(cloneTemplate(basketTemplate), events)
+const paymentForm = new PaymentForm(cloneTemplate(paymentFormTemplate), events)
 
+
+// Начальное отображение карточек
+events.on('items:changed', (data: { items: IProduct[] })=> {
+    const cardsArrayHTML = data.items.map((item) => {
+        const card = new Card(
+            cloneTemplate(cardCatalogTemplate), 
+            { onClick: () => events.emit('card:select', item) }
+        )
+        return card.render(item)
+    })
+    page.render({catalog: cardsArrayHTML})
+})
+
+// Карточка и Превью
 events.on('card:select', (item: IProduct)=> {
     appData.setPreview(item)
-    
 })
 
 events.on('preview:changed', (item: IProduct)=> {
@@ -41,16 +59,22 @@ events.on('preview:changed', (item: IProduct)=> {
     modal.render({content: cardPreview.render(item)})
 })
 
+// События Корзины
 events.on('basket:changed', () => {
     const basketItems = appData.items.filter((item)=> item.inBasket)
 	const basketHTMLElements = basketItems.map((item, index)=> {
         const card = new Card(cloneTemplate(cardBasketTemplate), 
             { onClick: () => {
                 appData.removeFromBasket(item)
-                page.basketCounter = appData.getBasketItemsId().length
+                const basketItemsLenght = appData.getBasketItemsId().length
+                if (basketItemsLenght === 0) {
+                    basket.isButtonDisabled(true)
+                }
+                page.basketCounter = basketItemsLenght
                 basket.total = appData.getTotalPrice()
             } }
         )
+        basket.isButtonDisabled(false)
         Object.assign(item, {index: index + 1})
         return card.render(item)
     })
@@ -65,22 +89,39 @@ events.on('card:add', (item: IProduct)=> {
 })
 
 events.on('basket:open', ()=> {
+    if(appData.getBasketItemsId().length === 0) {
+        basket.isButtonDisabled(true)
+    }
     modal.render({content: basket.render()})
 })
 
-events.on('items:changed', (data: { items: IProduct[] })=> {
-    const cardsArrayHTML = data.items.map((item) => {
-        const card = new Card(
-            cloneTemplate(cardCatalogTemplate), 
-            { onClick: () => events.emit('card:select', item) }
-        )
-        return card.render(item)
-    })
-    page.render({catalog: cardsArrayHTML})
+// События заказа
+events.on('order:open', ()=> {
+    modal.render({content: paymentForm.render()})
 })
 
-events.on('modal:opened', ()=> { page.isPageLocked(true) })
+events.on('payment:change', (data: IFormErrors)=> {
+    orderData.setPayments(data.payment as TPayment, data.address)
+})
 
+events.on('formErrorsOrder:change', (formErrors: IFormErrors)=> {
+    if (Object.keys(formErrors).length !== 0) {
+        paymentForm.isButtonDisabled(true)
+        if (formErrors.address) {
+            paymentForm.setErrorMassage(formErrors.address)
+        } else if (formErrors.payment) {
+            paymentForm.setErrorMassage(formErrors.payment)
+        }
+    } else {
+        paymentForm.setErrorMassage('')
+        paymentForm.isButtonDisabled(false)
+    }
+    
+    
+})
+
+// События открытия Модалки, блокировка прокрутки страницы
+events.on('modal:opened', ()=> { page.isPageLocked(true) })
 events.on('modal:closed', ()=> { page.isPageLocked(false) })
 
 

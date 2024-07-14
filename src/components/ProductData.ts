@@ -1,13 +1,11 @@
 import { Model } from './base/Model';
 import {IProduct, TServerProduct } from "../types";
-import { EventEmitter, IEvents } from './base/events';
-// export type CatalogChangeEvent = {
-//     catalog: IProductsData[]
-//   };
+
 
 // Интерфейс хранения данных.
 interface IProductsData {
 	items: IProduct[]
+    setCatalogItems(items: TServerProduct[]): void
     setPreview(item: IProduct): void
     checkProductInBasket(id: string): boolean
     getTotalPrice(): number

@@ -1,5 +1,5 @@
 import { Model } from './base/Model';
-import {IOrder, TContactForm, TPaymentForm, TPayment, TOrderResult, FormErrors} from "../types";
+import {IOrder, TContactForm, TPaymentForm, TPayment, TOrderResult, IFormErrors} from "../types";
 
 interface IOrderActions {
     getUserDate(): IOrder
@@ -11,11 +11,11 @@ interface IOrderActions {
 }
 
 export class Order extends Model<IOrder> implements IOrderActions {
-    payment: string = ''
-    address: string = ''
-    phone: string = ''
-    email: string = ''
-    formErrors: FormErrors = {}
+    protected payment: TPayment = ''
+    protected address: string = ''
+    protected phone: string = ''
+    protected email: string = ''
+    protected formErrors: IFormErrors = {}
 
     getUserDate() {
         return { 
@@ -30,6 +30,7 @@ export class Order extends Model<IOrder> implements IOrderActions {
         // добавить валидацию
         this.payment = payment
         this.address = address
+        this.validateOrder()
     }
 
     setContacts(phone: string, email: string) {
