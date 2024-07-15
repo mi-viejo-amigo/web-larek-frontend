@@ -1641,6 +1641,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/validator@^13.12.0":
+  version "13.12.0"
+  resolved "http://npm.prakticum-team.ru/@types/validator/-/validator-13.12.0.tgz"
+  integrity sha512-nH45Lk7oPIJ1RVOF6JgFI6Dy0QpHEzq4QecZhvguxYPDwT8c93prCMqAtiIttm39voZ+DDR+qkNnMpJmMBRqag==
+
 "@types/vinyl@^2.0.4":
   version "2.0.12"
   resolved "http://npm.prakticum-team.ru/@types/vinyl/-/vinyl-2.0.12.tgz"
@@ -6959,6 +6964,11 @@ validate-npm-package-name@^5.0.0:
   version "5.0.1"
   resolved "http://npm.prakticum-team.ru/validate-npm-package-name/-/validate-npm-package-name-5.0.1.tgz"
   integrity sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==
+
+validator@^13.12.0:
+  version "13.12.0"
+  resolved "http://npm.prakticum-team.ru/validator/-/validator-13.12.0.tgz"
+  integrity sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==
 
 vary@~1.1.2:
   version "1.1.2"

@@ -43,5 +43,9 @@
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier ./src --write",
     "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@types/validator": "^13.12.0",
+    "validator": "^13.12.0"
   }
 }

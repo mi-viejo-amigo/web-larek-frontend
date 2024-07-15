@@ -1,5 +1,7 @@
-import { Model } from './base/Model';
-import {IOrder, TContactForm, TPaymentForm, TPayment, TOrderResult, IFormErrors} from "../types";
+import { Model } from './base/Model'
+import {IOrder, TContactForm, TPaymentForm, TPayment, TOrderResult, IFormErrors} from "../types"
+// Импорт объекта с методами для валидации почты и телефона
+import validator from 'validator' 
 
 interface IOrderActions {
     getUserDate(): IOrder
@@ -27,16 +29,15 @@ export class Order extends Model<IOrder> implements IOrderActions {
     }
 
     setPayments(payment: TPayment, address: string) {
-        // добавить валидацию
         this.payment = payment
         this.address = address
         this.validateOrder()
     }
 
     setContacts(phone: string, email: string) {
-        // добавить валидацию
         this.phone = phone
         this.email = email
+        this.validateContact()
     }
 
     clearOrder() {
@@ -51,10 +52,15 @@ export class Order extends Model<IOrder> implements IOrderActions {
     validateContact() {
         const errors: typeof this.formErrors = {}
         if (!this.phone) {
-            errors.phone = 'Необходимо указать номер телефона.'
+            errors.phone = 'Необходимо указать номер телефона.';
+        } else if (!validator.isMobilePhone(this.phone, 'any', { strictMode: true })) {
+            errors.phone = 'Неверный формат номера телефона.';
         }
+
         if (!this.email) {
-            errors.email = 'Необходимо указать адрес электронной почты.'
+            errors.email = 'Необходимо указать адрес электронной почты.';
+        } else if (!validator.isEmail(this.email)) {
+            errors.email = 'Неверный формат электронной почты.';
         }
         this.formErrors = errors
         this.events.emit('formErrorsContact:change', this.formErrors)
@@ -72,7 +78,7 @@ export class Order extends Model<IOrder> implements IOrderActions {
        }
      
         this.formErrors = errors;
-        this.events.emit('formErrorsOrder:change', this.formErrors);
+        this.events.emit('formErrorsPayment:change', this.formErrors);
         return Object.keys(errors).length === 0;
     }
 }

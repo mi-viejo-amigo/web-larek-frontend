@@ -6,11 +6,13 @@ import { ProdAPI } from './components/ProdAPI'
 import { ProductsData } from './components/ProductData'
 import { Card } from './components/Card'
 import { Order } from './components/Order'
-import { IFormErrors, IOrder, IProduct, TPayment } from './types'
+import { IFormErrors, IOrder, IProduct, TOrderResult, TPayment } from './types'
 import { Page } from './components/Page'
 import { Modal } from './components/common/Modal'
 import { BasketView } from './components/common/Basket'
 import { PaymentForm } from './components/common/PaymentForm'
+import { ContactsForm } from './components/common/ContactForm'
+import { Success } from './components/common/Success'
 
 // Шаблоны Карточек
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog')
@@ -19,8 +21,11 @@ const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket')
 
 // Шаблон Корзины
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket')
+// Шаблоны Форм
 const paymentFormTemplate = ensureElement<HTMLTemplateElement>('#order')
 const contactFormTemplate = ensureElement<HTMLTemplateElement>('#contacts')
+// Шаблон подтверждения Успешной покупки
+const successTemplate = ensureElement<HTMLTemplateElement>('#success')
 
 // Элемент модального Окна
 const modalContainer = ensureElement<HTMLElement>('#modal-container')
@@ -34,6 +39,8 @@ const page = new Page(document.body, events)
 const modal = new Modal(modalContainer, events)
 const basket = new BasketView(cloneTemplate(basketTemplate), events)
 const paymentForm = new PaymentForm(cloneTemplate(paymentFormTemplate), events)
+const contactsForm = new ContactsForm(cloneTemplate(contactFormTemplate), events)
+const successView = new Success(cloneTemplate(successTemplate), events)
 
 
 // Начальное отображение карточек
@@ -62,25 +69,21 @@ events.on('preview:changed', (item: IProduct)=> {
 // События Корзины
 events.on('basket:changed', () => {
     const basketItems = appData.items.filter((item)=> item.inBasket)
-	const basketHTMLElements = basketItems.map((item, index)=> {
+	const cardsForBasketHTMLElements = basketItems.map((item, index)=> {
         const card = new Card(cloneTemplate(cardBasketTemplate), 
             { onClick: () => {
                 appData.removeFromBasket(item)
-                const basketItemsLenght = appData.getBasketItemsId().length
-                if (basketItemsLenght === 0) {
-                    basket.isButtonDisabled(true)
-                }
-                page.basketCounter = basketItemsLenght
+                page.basketCounter = appData.getBasketItemsId().length
                 basket.total = appData.getTotalPrice()
             } }
         )
-        basket.isButtonDisabled(false)
         Object.assign(item, {index: index + 1})
         return card.render(item)
     })
-    basket.items = basketHTMLElements
+    basket.items = cardsForBasketHTMLElements
     basket.total = appData.getTotalPrice()
     page.basketCounter = basketItems.length
+    basket.isButtonDisabled(basketItems.length === 0)
 });
 
 events.on('card:add', (item: IProduct)=> {
@@ -89,14 +92,12 @@ events.on('card:add', (item: IProduct)=> {
 })
 
 events.on('basket:open', ()=> {
-    if(appData.getBasketItemsId().length === 0) {
-        basket.isButtonDisabled(true)
-    }
+    basket.isButtonDisabled(appData.getBasketItemsId().length === 0)
     modal.render({content: basket.render()})
 })
 
 // События заказа
-events.on('order:open', ()=> {
+events.on('payment:open', ()=> {
     modal.render({content: paymentForm.render()})
 })
 
@@ -104,7 +105,7 @@ events.on('payment:change', (data: IFormErrors)=> {
     orderData.setPayments(data.payment as TPayment, data.address)
 })
 
-events.on('formErrorsOrder:change', (formErrors: IFormErrors)=> {
+events.on('formErrorsPayment:change', (formErrors: IFormErrors)=> {
     if (Object.keys(formErrors).length !== 0) {
         paymentForm.isButtonDisabled(true)
         if (formErrors.address) {
@@ -116,8 +117,49 @@ events.on('formErrorsOrder:change', (formErrors: IFormErrors)=> {
         paymentForm.setErrorMassage('')
         paymentForm.isButtonDisabled(false)
     }
+})
+
+events.on('payments:submit', (data: IOrder)=> {
+    orderData.setPayments(data.payment, data.address)
+    modal.render({content: contactsForm.render()})
+})
+
+events.on('contacts:change', (data: IFormErrors)=> {
+    orderData.setContacts(data.phone, data.email)
+})
+
+events.on('formErrorsContact:change', (formErrors: IFormErrors)=> {
+    if (Object.keys(formErrors).length > 0) {
+        contactsForm.isButtonDisabled(true)
+        if(formErrors.email) {
+            contactsForm.setErrorMassage(formErrors.email)
+        } else if (formErrors.phone) {
+            contactsForm.setErrorMassage(formErrors.phone)
+        }
+    } else {
+        contactsForm.setErrorMassage('')
+        contactsForm.isButtonDisabled(false)
+    }
+})
+
+events.on('contacts:submit', (data: IOrder)=> {
+    orderData.setContacts(data.phone, data.email)
+    const totalOrderPrice = appData.getTotalPrice()
+    const basketIdArray = appData.getBasketItemsId()
+    const usersDates = orderData.getUserDate()
+    api.orderItems(usersDates, basketIdArray, totalOrderPrice)
+        .then((response: TOrderResult)=> {
+            modal.render({content: successView.render({total: response.total})})
+        })
+        .then(()=> {
+            appData.clearBasket()
+            orderData.clearOrder()
+        })
     
-    
+})
+
+events.on('success:done', ()=> {
+    modal.close()
 })
 
 // События открытия Модалки, блокировка прокрутки страницы
@@ -131,72 +173,6 @@ api.getCardList()
         appData.setCatalogItems(items)
     })
     .catch(err => { console.error(err)})
-
-// api.getCardList()
-//     .then((items) => {
-        
-//         appData.setCatalogItems(items)
-//         appData.addItemToBasket(items[1] as IProduct)
-//         appData.addItemToBasket(items[0] as IProduct)
-//         let cardArray: HTMLElement[] = []
-        
-//         // Создаем карточку и добавляем ее в контейнер
-//         appData.getCatalogItems().forEach((item)=>{
-            
-//             const card1 = new Card(cloneTemplate(cardCatalogTemplate), {
-//                 onClick: () => events.emit('card:select', item),
-//             });
-
-//             cardArray.push(card1.render({
-//                 title: item.title,
-//                 image: item.image,
-//                 category: item.category,
-//                 price: item.price
-//             },
-//         ))
-//         })
-//         return cardArray
-        
-//     })
-//     .then((cards) => {
-//         page.render({catalog: cards})
-//     })
-    
-
-
-// const userOrder = new Order({}, events)
-// userOrder.setContacts('89759108785', 'nkt.frlv7@yandex.ru')
-// userOrder.setPayments('Онлайн', 'улица Пушкина, дом колотушкина')
-
-
-// setTimeout(()=> {
-    
-    
-//     api.orderItems(userOrder.getUserDate(), appData.getBasketItemsId(), appData.getTotalPrice())
-//     .then((res)=> {
-//         console.log(res)
-//     })
-//     .catch((error) => {
-//         console.error("Order failed: ", error);
-//     });
-// }, 1000)
-
-
-
-
-
-
-
-
-
-// events.onAll(({ eventName, data }) => {
-//     console.log(eventName, data);
-// })
-
-// const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
-
-// const card = new Card(cloneTemplate(cardCatalogTemplate))
-
 
 
 

@@ -5,9 +5,8 @@ import { ensureAllElements, ensureElement } from "../../utils/utils"
 
 
 interface IPaymentForm {
-    paymant: TPayment
-    address: string
-    formErrors: IFormErrors
+    setErrorMassage(massage: string): void
+    isButtonDisabled(state: boolean): void
 }
 
 export class PaymentForm extends Component<IPaymentForm> {
@@ -30,7 +29,7 @@ export class PaymentForm extends Component<IPaymentForm> {
             const selectedBtn = this._paymentTypeButtons.find((btn)=> btn.classList.contains('button_alt-active'))
             // Добавляем проверку на undefined
             const paymentValue = selectedBtn ? selectedBtn.textContent : '';
-            events.emit('payment:change', {address: this._addressTextArea.value, payment: paymentValue} as IFormErrors)
+            events.emit('payment:change', {address: this._addressTextArea.value, payment: paymentValue} as IOrder)
         })
         
         // LISTENERS
@@ -40,14 +39,20 @@ export class PaymentForm extends Component<IPaymentForm> {
                     this.toggleClass(button, 'button_alt-active', false);
                 })
                 this.toggleClass(btn, 'button_alt-active', true)
-                events.emit('payment:change', {payment: btn.textContent, address: this._addressTextArea.value})
+                events.emit('payment:change', {
+                    payment: btn.textContent,
+                    address: this._addressTextArea.value
+                })
             })
         })
 
         this._submitBtn.addEventListener('click', (evt)=> {
             evt.preventDefault()
-            // ДОПИСАТЬ ОБЪЕКТ ПЕРЕДАВАЕМЫЙ ПРИ САБМИТЕ или оставить без данных
-            events.emit('order:submit', {})
+            const selectedButton = this._paymentTypeButtons.find((btn)=> btn.classList.contains('button_alt-active'))
+            events.emit('payments:submit', {
+                payment: selectedButton.textContent,
+                address: this._addressTextArea.value
+            })
         })
     }
 

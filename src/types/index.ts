@@ -10,7 +10,7 @@ export type TBasketData = Pick<IProduct , 'id' | 'title' | 'price'>
 export type TServerProduct = Partial<IProduct>
 export type TOrderResult = {
   total: number
-  id: string
+  id: string[]
 }
 
 // Интерфейс хранения данных приложения.
