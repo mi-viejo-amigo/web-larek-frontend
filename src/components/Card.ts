@@ -67,7 +67,7 @@ export class Card extends Component<ICard> {
             };
             this._category.classList.add(`card__category_${modificatorMap[value]}`);
         } else {
-            console.warn('Element .card__category in Card, not found');
+            console.warn('Element .card__category in Card, not found. This is expected if the current card template does not include this element.');
         }
 	}
 

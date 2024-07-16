@@ -1,5 +1,5 @@
 import { Api } from './base/api';
-import {TOrderResult, IProduct, IOrder, TServerProduct} from "../types/index";
+import {TOrderResult, IProduct, IOrder, TServerProduct, IServerOrder} from "../types/index";
 
 
 
@@ -30,8 +30,7 @@ export class ProdAPI extends Api implements IProdAPI {
         );
     }
 
-    orderItems(userDates: IOrder, itemsId: string[], totalPrice: number): Promise<TOrderResult> {
-        const order = {...userDates, items: itemsId, total: totalPrice}
+    orderItems(order: IServerOrder): Promise<TOrderResult> {
         return this.post<TOrderResult>('/order', order).then(
             (data: TOrderResult) => data
         );

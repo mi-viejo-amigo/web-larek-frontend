@@ -10,7 +10,7 @@ export type TBasketData = Pick<IProduct , 'id' | 'title' | 'price'>
 export type TServerProduct = Partial<IProduct>
 export type TOrderResult = {
   total: number
-  id: string[]
+  id: string
 }
 
 // Интерфейс хранения данных приложения.
@@ -29,6 +29,11 @@ export interface IOrder {
   phone: string;
   address: string;
   payment: TPayment;
+}
+
+export interface IServerOrder extends IOrder {
+  items: string[]
+  total: number
 }
 
 export type IFormErrors = Partial<Record<keyof IOrder, string>>;

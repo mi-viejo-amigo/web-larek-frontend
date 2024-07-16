@@ -6,7 +6,7 @@ import { ProdAPI } from './components/ProdAPI'
 import { ProductsData } from './components/ProductData'
 import { Card } from './components/Card'
 import { Order } from './components/Order'
-import { IFormErrors, IOrder, IProduct, TOrderResult, TPayment } from './types'
+import { IFormErrors, IOrder, IProduct, TOrderResult, TPayment, IServerOrder } from './types'
 import { Page } from './components/Page'
 import { Modal } from './components/common/Modal'
 import { BasketView } from './components/common/Basket'
@@ -147,7 +147,8 @@ events.on('contacts:submit', (data: IOrder)=> {
     const totalOrderPrice = appData.getTotalPrice()
     const basketIdArray = appData.getBasketItemsId()
     const usersDates = orderData.getUserDate()
-    api.orderItems(usersDates, basketIdArray, totalOrderPrice)
+    const order = {...usersDates, items: basketIdArray, total: totalOrderPrice}
+    api.orderItems(order as IServerOrder)
         .then((response: TOrderResult)=> {
             modal.render({content: successView.render({total: response.total})})
         })
