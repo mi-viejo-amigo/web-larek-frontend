@@ -6,6 +6,7 @@ import { EventEmitter, IEvents } from "./base/events";
 interface IPage { 
 	basketCounter: number
 	catalog: HTMLElement[]
+	locked: boolean
 }
 
 export class Page extends Component<IPage> {
@@ -34,7 +35,7 @@ export class Page extends Component<IPage> {
         this._catalog.replaceChildren(...items);
     }
 
-	isPageLocked(value: boolean) {
+	set locked(value: boolean) {
 		this.toggleClass(this._wrapper, 'page__wrapper_locked', value)
 	}
 }

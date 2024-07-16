@@ -1,7 +1,7 @@
-import { Component } from "../base/Component"
-import { IOrder, TOrderResult, IFormErrors, TPayment } from "../../types"
-import { IEvents } from "../base/events"
-import { ensureAllElements, ensureElement } from "../../utils/utils"
+import { Component } from "./base/Component"
+import { IOrder, TOrderResult, IFormErrors, TPayment } from "../types"
+import { IEvents } from "./base/events"
+import { ensureAllElements, ensureElement } from "../utils/utils"
 
 
 interface IPaymentForm {

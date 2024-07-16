@@ -9,9 +9,9 @@ import { Order } from './components/Order'
 import { IFormErrors, IOrder, IProduct, TOrderResult, TPayment, IServerOrder } from './types'
 import { Page } from './components/Page'
 import { Modal } from './components/common/Modal'
-import { BasketView } from './components/common/Basket'
-import { PaymentForm } from './components/common/PaymentForm'
-import { ContactsForm } from './components/common/ContactForm'
+import { BasketView } from './components/Basket'
+import { PaymentForm } from './components/PaymentForm'
+import { ContactsForm } from './components/ContactForm'
 import { Success } from './components/common/Success'
 
 // Шаблоны Карточек
@@ -103,6 +103,8 @@ events.on('payment:open', ()=> {
 
 events.on('payment:change', (data: IFormErrors)=> {
     orderData.setPayments(data.payment as TPayment, data.address)
+    console.log(appData);
+    console.log(orderData);
 })
 
 events.on('formErrorsPayment:change', (formErrors: IFormErrors)=> {
@@ -148,8 +150,8 @@ events.on('success:done', ()=> {
 })
 
 // События открытия Модалки, блокировка прокрутки страницы
-events.on('modal:opened', ()=> { page.isPageLocked(true) })
-events.on('modal:closed', ()=> { page.isPageLocked(false) })
+events.on('modal:opened', ()=> { page.render({locked: true}) })
+events.on('modal:closed', ()=> { page.render({locked: false}) })
 
 
 // Получаем карточки с сервера

@@ -1,7 +1,7 @@
-import { ensureElement } from "../../utils/utils"
-import { IEvents } from "../base/events"
-import { Component } from "../base/Component"
-import { createElement } from  "../../utils/utils"
+import { ensureElement } from "../utils/utils"
+import { IEvents } from "./base/events"
+import { Component } from "./base/Component"
+import { createElement } from "../utils/utils"
 
 interface IBasket {
     items: HTMLElement[]

@@ -1,7 +1,7 @@
-import { Component } from "../base/Component"
-import { IOrder, TOrderResult, IFormErrors, TPayment } from "../../types"
-import { ensureAllElements, ensureElement } from "../../utils/utils"
-import { IEvents } from "../base/events"
+import { Component } from "./base/Component"
+import { IOrder, TOrderResult, IFormErrors, TPayment } from "../types"
+import { ensureAllElements, ensureElement } from "../utils/utils"
+import { IEvents } from "./base/events"
 
 interface IContactsForm {
     errors: string[]
