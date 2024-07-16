@@ -4,8 +4,8 @@ import { ensureAllElements, ensureElement } from "../../utils/utils"
 import { IEvents } from "../base/events"
 
 interface IContactsForm {
-    setErrorMassage(massage: string): void
-    isButtonDisabled(state: boolean): void
+    errors: string[]
+    valid: boolean
 }
 
 export class ContactsForm extends Component<IContactsForm> {
@@ -41,13 +41,12 @@ export class ContactsForm extends Component<IContactsForm> {
         })
     }
 
-    setErrorMassage(massage: string) {
-        this.setText(this._errorElement, massage)
+    set errors(massages: string[]) {
+        this.setText(this._errorElement, massages.join('\n'))
     }
 
-    isButtonDisabled(state: boolean) {
-        this.setDisabled(this._submitButton, state)
+    set valid(state: boolean) {
+        this.setDisabled(this._submitButton, !state)
     }
-
 
 }

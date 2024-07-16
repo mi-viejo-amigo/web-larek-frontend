@@ -5,8 +5,8 @@ import { ensureAllElements, ensureElement } from "../../utils/utils"
 
 
 interface IPaymentForm {
-    setErrorMassage(massage: string): void
-    isButtonDisabled(state: boolean): void
+    errors: string[]
+    valid: boolean
 }
 
 export class PaymentForm extends Component<IPaymentForm> {
@@ -56,12 +56,12 @@ export class PaymentForm extends Component<IPaymentForm> {
         })
     }
 
-    setErrorMassage(massage: string) {
-        this.setText(this._errorElement, massage)
+    set errors(massages: string[]) {
+        this.setText(this._errorElement, massages.join('\n'))
     }
 
-    isButtonDisabled(state: boolean) {
-        this.setDisabled(this._submitBtn, state)
+    set valid(state: boolean) {
+        this.setDisabled(this._submitBtn, !state)
     }
 
 }

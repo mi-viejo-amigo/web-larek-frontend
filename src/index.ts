@@ -106,17 +106,9 @@ events.on('payment:change', (data: IFormErrors)=> {
 })
 
 events.on('formErrorsPayment:change', (formErrors: IFormErrors)=> {
-    if (Object.keys(formErrors).length !== 0) {
-        paymentForm.isButtonDisabled(true)
-        if (formErrors.address) {
-            paymentForm.setErrorMassage(formErrors.address)
-        } else if (formErrors.payment) {
-            paymentForm.setErrorMassage(formErrors.payment)
-        }
-    } else {
-        paymentForm.setErrorMassage('')
-        paymentForm.isButtonDisabled(false)
-    }
+    const isEmpty = Object.keys(formErrors).length === 0
+    const validation = {errors: [formErrors.address || '', formErrors.payment || ''], valid: isEmpty}
+    paymentForm.render(validation)
 })
 
 events.on('payments:submit', (data: IOrder)=> {
@@ -129,17 +121,9 @@ events.on('contacts:change', (data: IFormErrors)=> {
 })
 
 events.on('formErrorsContact:change', (formErrors: IFormErrors)=> {
-    if (Object.keys(formErrors).length > 0) {
-        contactsForm.isButtonDisabled(true)
-        if(formErrors.email) {
-            contactsForm.setErrorMassage(formErrors.email)
-        } else if (formErrors.phone) {
-            contactsForm.setErrorMassage(formErrors.phone)
-        }
-    } else {
-        contactsForm.setErrorMassage('')
-        contactsForm.isButtonDisabled(false)
-    }
+    const isEmpty = Object.keys(formErrors).length === 0
+    const validation = {errors: [formErrors.email || '', formErrors.phone || ''], valid: isEmpty}
+    contactsForm.render(validation)
 })
 
 events.on('contacts:submit', (data: IOrder)=> {
