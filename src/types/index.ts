@@ -1,7 +1,7 @@
 import { IEvents } from "../components/base/events"
 
 export type CardСategory = 'хард-скил' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'другое'
-export type TPayment = 'Онлайн' | 'При получении' | ''
+// export type string = 'Онлайн' | 'При получении' | ''
 export type TPaymentForm = Pick<IOrder, 'payment' | 'address'>
 export type TContactForm = Pick<IOrder, 'email' | 'phone'>
 export type TBasketData = Pick<IProduct , 'id' | 'title' | 'price'>
@@ -28,7 +28,7 @@ export interface IOrder {
   email: string;
   phone: string;
   address: string;
-  payment: TPayment;
+  payment: string;
 }
 
 export interface IServerOrder extends IOrder {

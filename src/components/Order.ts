@@ -1,19 +1,19 @@
 import { Model } from './base/Model'
-import {IOrder, TContactForm, TPaymentForm, TPayment, TOrderResult, IFormErrors} from "../types"
+import {IOrder, TContactForm, TPaymentForm, TOrderResult, IFormErrors} from "../types"
 // Импорт объекта с методами для валидации почты и телефона
 import validator from 'validator' 
 
 interface IOrderActions {
     getUserDate(): IOrder
-    setPayments(payment: TPayment, address: string): void
+    setPayments(field: keyof IOrder, value: string): void
     validateOrder():boolean
-    setContacts(phone: string, email: string): void
+    setContacts(field: keyof IOrder, value: string): void
     validateContact(): boolean
     clearOrder(): void
 }
 
 export class Order extends Model<IOrder> implements IOrderActions {
-    protected payment: TPayment = ''
+    protected payment: string = ''
     protected address: string = ''
     protected phone: string = ''
     protected email: string = ''
@@ -28,15 +28,13 @@ export class Order extends Model<IOrder> implements IOrderActions {
          }
     }
 
-    setPayments(payment: TPayment, address: string) {
-        this.payment = payment
-        this.address = address
+    setPayments(field: keyof IOrder, value: string) {
+        this[field] = value
         this.validateOrder()
     }
 
-    setContacts(phone: string, email: string) {
-        this.phone = phone
-        this.email = email
+    setContacts(field: keyof IOrder, value: string) {
+        this[field] = value
         this.validateContact()
     }
 
@@ -78,7 +76,7 @@ export class Order extends Model<IOrder> implements IOrderActions {
        }
      
         this.formErrors = errors;
-        this.events.emit('formErrorsPayment:change', this.formErrors);
+        this.events.emit('formErrorsOrder:change', this.formErrors);
         return Object.keys(errors).length === 0;
     }
 }

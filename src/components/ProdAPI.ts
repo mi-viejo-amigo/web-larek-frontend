@@ -10,7 +10,7 @@ export type ApiListResponse<T> = {
 
 export interface IProdAPI {
     getCardList: () => Promise<TServerProduct[]>;
-    orderItems: (userDates: IOrder, itemsId: string[], totalPrice: number) => Promise<TOrderResult>; 
+    orderItems: (order: IServerOrder) => Promise<TOrderResult>; 
 }
 
 export class ProdAPI extends Api implements IProdAPI {

@@ -65,7 +65,7 @@ export class Card extends Component<ICard> {
                 'дополнительное': 'additional',
                 'кнопка': 'button'
             };
-            this._category.classList.add(`card__category_${modificatorMap[value]}`);
+            this.toggleClass(this._category, `card__category_${modificatorMap[value]}`, true)
         } else {
             console.warn('Element .card__category in Card, not found. This is expected if the current card template does not include this element.');
         }
@@ -81,11 +81,7 @@ export class Card extends Component<ICard> {
 
 
     isButtonDisabled(id: string, itemsId: string[], price: number | null): void {
-        if (price === null || itemsId.includes(id)) {
-            this.setDisabled(this._button, true)
-        } else {
-            this.setDisabled(this._button, false)
-        }
+        this.setDisabled(this._button, price === null || itemsId.includes(id));
     }
 
         

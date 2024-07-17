@@ -22,7 +22,7 @@ export class BasketView extends Component<IBasket> {
 
         
         this._button.addEventListener('click', ()=> {
-            this.events.emit('payment:open')
+            this.events.emit('order:open')
         })
         this.items = []
 

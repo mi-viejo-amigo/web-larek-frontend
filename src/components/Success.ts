@@ -1,7 +1,6 @@
-import { Component } from "../base/Component"
-import { IOrder, TOrderResult } from "../../types"
-import { IEvents } from "../base/events"
-import { ensureElement } from "../../utils/utils"
+import { Component } from "./base/Component"
+import { IEvents } from "./base/events"
+import { ensureElement } from "../utils/utils" 
 
 interface ISuccess {
     total: number

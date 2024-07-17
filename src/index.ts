@@ -6,13 +6,13 @@ import { ProdAPI } from './components/ProdAPI'
 import { ProductsData } from './components/ProductData'
 import { Card } from './components/Card'
 import { Order } from './components/Order'
-import { IFormErrors, IOrder, IProduct, TOrderResult, TPayment, IServerOrder } from './types'
+import { IFormErrors, IOrder, IProduct, TOrderResult, IServerOrder } from './types'
 import { Page } from './components/Page'
 import { Modal } from './components/common/Modal'
 import { BasketView } from './components/Basket'
-import { PaymentForm } from './components/PaymentForm'
+import { DeliveryForm } from './components/DeliveryForm'
 import { ContactsForm } from './components/ContactForm'
-import { Success } from './components/common/Success'
+import { Success } from './components/Success' 
 
 // Шаблоны Карточек
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog')
@@ -22,7 +22,7 @@ const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket')
 // Шаблон Корзины
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket')
 // Шаблоны Форм
-const paymentFormTemplate = ensureElement<HTMLTemplateElement>('#order')
+const deliveryFormTemplate = ensureElement<HTMLTemplateElement>('#order')
 const contactFormTemplate = ensureElement<HTMLTemplateElement>('#contacts')
 // Шаблон подтверждения Успешной покупки
 const successTemplate = ensureElement<HTMLTemplateElement>('#success')
@@ -38,7 +38,7 @@ const orderData = new Order({}, events)
 const page = new Page(document.body, events)
 const modal = new Modal(modalContainer, events)
 const basket = new BasketView(cloneTemplate(basketTemplate), events)
-const paymentForm = new PaymentForm(cloneTemplate(paymentFormTemplate), events)
+const deliveryForm = new DeliveryForm(cloneTemplate(deliveryFormTemplate), events)
 const contactsForm = new ContactsForm(cloneTemplate(contactFormTemplate), events)
 const successView = new Success(cloneTemplate(successTemplate), events)
 
@@ -97,29 +97,40 @@ events.on('basket:open', ()=> {
 })
 
 // События заказа
-events.on('payment:open', ()=> {
-    modal.render({content: paymentForm.render()})
+events.on('order:open', ()=> {
+    modal.render({content: deliveryForm.render({
+            valid: false,
+            errors: [],
+            address: '',
+            payment: ''
+        }
+    )})
 })
 
-events.on('payment:change', (data: IFormErrors)=> {
-    orderData.setPayments(data.payment as TPayment, data.address)
-    console.log(appData);
-    console.log(orderData);
+events.on(/^contacts\..*:change/, (data: { field: keyof IOrder; value: string }) => {
+    const { field, value } = data
+    orderData.setContacts(field, value)
 })
 
-events.on('formErrorsPayment:change', (formErrors: IFormErrors)=> {
+events.on('formErrorsOrder:change', (formErrors: IFormErrors)=> {
     const isEmpty = Object.keys(formErrors).length === 0
     const validation = {errors: [formErrors.address || '', formErrors.payment || ''], valid: isEmpty}
-    paymentForm.render(validation)
+    deliveryForm.render(validation)
 })
 
-events.on('payments:submit', (data: IOrder)=> {
-    orderData.setPayments(data.payment, data.address)
-    modal.render({content: contactsForm.render()})
+events.on('order:submit', ()=> {
+    // console.log(orderData.getUserDate());
+    modal.render({content: contactsForm.render({
+        valid: false,
+        errors: [],
+        phone: '',
+        email: ''
+    })})
 })
 
-events.on('contacts:change', (data: IFormErrors)=> {
-    orderData.setContacts(data.phone, data.email)
+events.on(/^order\..*:change/, (data: { field: keyof IOrder; value: string }) => {
+    const { field, value } = data
+    orderData.setPayments(field, value)
 })
 
 events.on('formErrorsContact:change', (formErrors: IFormErrors)=> {
@@ -128,20 +139,19 @@ events.on('formErrorsContact:change', (formErrors: IFormErrors)=> {
     contactsForm.render(validation)
 })
 
-events.on('contacts:submit', (data: IOrder)=> {
-    orderData.setContacts(data.phone, data.email)
+events.on('contacts:submit', ()=> {
     const totalOrderPrice = appData.getTotalPrice()
     const basketIdArray = appData.getBasketItemsId()
     const usersDates = orderData.getUserDate()
+    // console.log(orderData.getUserDate());
     const order = {...usersDates, items: basketIdArray, total: totalOrderPrice}
     api.orderItems(order as IServerOrder)
         .then((response: TOrderResult)=> {
             modal.render({content: successView.render({total: response.total})})
-        })
-        .then(()=> {
             appData.clearBasket()
             orderData.clearOrder()
         })
+        .catch(err => { console.error(err)})
     
 })
 
@@ -150,8 +160,8 @@ events.on('success:done', ()=> {
 })
 
 // События открытия Модалки, блокировка прокрутки страницы
-events.on('modal:opened', ()=> { page.render({locked: true}) })
-events.on('modal:closed', ()=> { page.render({locked: false}) })
+events.on('modal:open', ()=> { page.render({locked: true}) })
+events.on('modal:close', ()=> { page.render({locked: false}) })
 
 
 // Получаем карточки с сервера
