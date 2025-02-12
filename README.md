@@ -1,6 +1,6 @@
 # 🛍️ Web-Larek – Online Store for Web Developers  
 
-🔗 **Live Demo:** [Web-Larek](#)  
+🔗 **Live Demo:** [Web-Larek](https://web-larek-frontend.vercel.app/)  
 
 ---
 
