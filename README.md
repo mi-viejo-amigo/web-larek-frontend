@@ -1,3 +1,20 @@
+# 🛍️ Web-Larek – Online Store for Web Developers  
+
+🔗 **Live Demo:** [Web-Larek](#)  
+
+---
+
+## **About the Project**  
+**Web-Larek** is an **online store** built for web developers, allowing users to **browse products, add them to a cart, and place orders**. The project follows an **OOP architecture** and is implemented using **TypeScript** for better maintainability and scalability.  
+
+✨ **Key Features:**  
+- **Object-Oriented Programming (OOP) architecture** with modular components 📦  
+- **Event-driven approach** for interaction between data models and UI 🔄  
+- **Fully typed with TypeScript** to ensure type safety and structure 🛠️  
+- **Dynamic shopping cart** that allows adding and removing items 🛒  
+- **Order processing system** with form validation and API interaction 📑  
+- **SCSS for structured and scalable styling 🎨**  
+
 # Проектная работа "Веб-ларек"
 
 ## Web-ларёк: Интернет-магазин для веб-разработчиков
