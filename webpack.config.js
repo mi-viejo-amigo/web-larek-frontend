@@ -18,23 +18,25 @@ const config = {
   entry: "./src/index.ts",
   devtool: "source-map",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "public"),  // ✅ Изменено на public
+    filename: "bundle.js",
+    publicPath: "./",  // ✅ Указан путь
+    clean: true  // ✅ Очистка перед сборкой
   },
   devServer: {
     open: true,
     host: "localhost",
     watchFiles: ["src/pages/*.html"],
-    hot: true
+    hot: process.env.NODE_ENV !== "production"  // ✅ Убрали HMR в production
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "src/pages/index.html"
+      template: "src/pages/index.html",
+      filename: "index.html"  // ✅ Главный файл
     }),
 
     new MiniCssExtractPlugin(),
 
-    // Add your plugins here
-    // Learn more about plugins from https://webpack.js.org/configuration/plugins/
     new DefinePlugin({
       'process.env.DEVELOPMENT': !isProduction,
       'process.env.API_ORIGIN': JSON.stringify(process.env.API_ORIGIN ?? '')
@@ -66,10 +68,7 @@ const config = {
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
         type: "asset",
-      },
-
-      // Add your rules for custom modules here
-      // Learn more about loaders from https://webpack.js.org/loaders/
+      }
     ],
   },
   resolve: {
@@ -87,10 +86,6 @@ const config = {
 };
 
 module.exports = () => {
-  if (isProduction) {
-    config.mode = "production";
-  } else {
-    config.mode = "development";
-  }
+  config.mode = isProduction ? "production" : "development";
   return config;
 };
